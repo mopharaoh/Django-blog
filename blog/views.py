@@ -18,6 +18,10 @@ def home(request):
 def post_single(request,post):
     post=get_object_or_404(Post,slug=post,status='published')
 
+    fav = bool
+
+    if post.favourites.filter(id=request.user.id).exists():
+        fav=True
     allcomments=post.comments.filter(status=True)
     page=request.GET.get('page',1)
     paginator=Paginator(allcomments,3)
@@ -42,7 +46,7 @@ def post_single(request,post):
 
     return render(request,'single.html',
                   {'post':post,'user_comment':user_comment,
-                   'comments':comments,'comment_form':comment_form,'allcomments':allcomments})
+                   'comments':comments,'comment_form':comment_form,'allcomments':allcomments,'fav':fav})
 
 
 class CatListView(ListView):

@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.forms import AuthenticationForm , PasswordResetForm , SetPasswordForm ,PasswordChangeForm
 from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
-
+from accounts.models import Profile
 
 class PwdChangeForm(PasswordChangeForm):
     old_password=forms.CharField(label='Old password',widget=forms.PasswordInput(
@@ -115,3 +115,14 @@ class RegistrationForm(forms.ModelForm):
             {'class': 'form-control', 'placeholder': 'Password'})
         self.fields['password2'].widget.attrs.update(
             {'class': 'form-control', 'placeholder': 'Repeat Password'})
+        
+
+class UserProfileForm(forms.ModelForm):
+
+    class Meta:
+        model=Profile
+        fields=['bio','avatar']
+
+        widgets={
+            'bio':forms.Textarea(attrs={'class':'form-control','rows':'5'}),
+        }

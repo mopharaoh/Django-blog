@@ -1,5 +1,5 @@
-from django.shortcuts import render,redirect
-from django.http import HttpResponse
+from django.shortcuts import render,redirect,get_object_or_404
+from django.http import HttpResponse , HttpResponseRedirect
 from django.contrib.sites.shortcuts import get_current_site
 from django.utils.encoding import force_str , force_bytes
 from django.utils.http import urlsafe_base64_decode,urlsafe_base64_encode
@@ -7,10 +7,39 @@ from django.template.loader import render_to_string
 from django.conf import settings
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
-from .forms import RegistrationForm,UserEditForm
+from .forms import RegistrationForm,UserEditForm,UserProfileForm
 from .token import account_activation_token
 from django.contrib.auth.models import User
+from .models import Profile
+from blog.models import Post
 
+
+@login_required
+def favourite_list(request):
+    new=Post.newmanager.filter(favourites=request.user)
+    return render(request,'accounts/favourites.html',{'new': new})
+
+@login_required
+def favourite_add(request,id):
+    post=get_object_or_404(Post,id=id)
+    if post.favourites.filter(id=request.user.id).exists():
+        post.favourites.remove(request.user)
+    else:
+        post.favourites.add(request.user)
+    return HttpResponseRedirect(request.META['HTTP_REFERER'])
+
+def avatar(request):
+    if request.user.is_authenticated:
+        user = User.objects.get(username=request.user)
+        avatar = Profile.objects.filter(user=user)
+        context = {
+            "avatar": avatar,
+        }
+        return context
+    else:
+        return {
+            'NotLoggedIn': User.objects.none()
+        }
 
 @login_required
 def profile(request):
@@ -60,13 +89,20 @@ def activate(request,uidb64,token):
 @login_required
 def edit(request):
     if request.method == 'POST':
+
         user_form=UserEditForm(request.POST,instance=request.user)
-        if user_form.is_valid():
+        profile_form=UserProfileForm(request.POST,request.FILES,instance=request.user.profile)
+
+        if profile_form.is_valid() and user_form.is_valid():
             user_form.save()
+            profile_form.save()
             
     else:
         user_form=UserEditForm(instance=request.user)
-    return render(request,'accounts/update.html',{'user_form':user_form})
+        profile_form=UserProfileForm(instance=request.user.profile)
+    return render(request,'accounts/update.html',
+                  {'user_form':user_form,
+                'profile_form':profile_form})
 @login_required
 def delete_user(request):
     if request.method == 'POST':

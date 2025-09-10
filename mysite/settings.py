@@ -66,6 +66,9 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'blog.views.category_list',  #this view is available accessible on every page
+                'accounts.views.avatar',   
+
             ],
         },
     },

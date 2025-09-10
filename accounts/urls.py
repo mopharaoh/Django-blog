@@ -1,6 +1,7 @@
 from django.urls import path
 from . import views
 from django.contrib.auth import views as auth_views
+from django.contrib.auth.views import LogoutView
 from .forms import UserLoginForm,PwdResetForm,PwdResetConfirmForm,PwdChangeForm
 app_name='accounts'
 urlpatterns = [
@@ -21,7 +22,10 @@ urlpatterns = [
 
     path('profile/',views.profile,name='profile'),
     path('profile/edit/',views.edit,name='edit'),
+    path('fav/<int:id>/', views.favourite_add, name='favourite_add'),
+    path('profile/favourites/',views.favourite_list,name='favourite_list'),
     path('profile/delete/', views.delete_user, name='deleteuser'),
     path('register/', views.accounts_register, name='register'),
-    path('activate/<slug:uidb64>/<slug:token>/',views.activate,name='activate')
+    path('activate/<slug:uidb64>/<slug:token>/',views.activate,name='activate'),
+    path("logout/", LogoutView.as_view(next_page="login"), name="logout"),
 ]

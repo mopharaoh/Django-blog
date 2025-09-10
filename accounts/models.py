@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
-
+from django.dispatch import receiver
+from django.db.models.signals import post_save
 
 def user_directory_path(instance,filename):
     return 'users/avatars/{0}/{1}'.format(instance.user.id,filename)
@@ -16,3 +17,8 @@ class Profile(models.Model):
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
+
+@receiver(post_save, sender=User)
+def create_user_profile(sender, instance, created,**kwargs):
+    if created:
+        Profile.objects.create(user=instance)
