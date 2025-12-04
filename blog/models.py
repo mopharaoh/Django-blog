@@ -29,6 +29,14 @@ class Post(models.Model):
     content=models.TextField()
     status=models.CharField(max_length=10,choices=options,default='draft')
     favourites=models.ManyToManyField(User,related_name='favourite',default=None,blank=True)
+    
+    likes=models.ManyToManyField(User,related_name='likes',default=None,blank=True)
+    like_count=models.IntegerField(default=0)
+    
+    thumbsup=models.IntegerField(default='0')
+    thumbsdown=models.IntegerField(default='0')
+    thumbs=models.ManyToManyField(User,related_name='thumbs',default=None,blank=True)
+    
     objects=models.Manager()
     newmanager=NewManager()
 
@@ -58,3 +66,9 @@ class Comment(MPTTModel):
 
     class MPTTMeta:
         order_insertion_by=['publish']
+
+        
+class Vote(models.Model):
+    post=models.ForeignKey(Post,on_delete=models.CASCADE,related_name='votes')
+    user=models.ForeignKey(User,on_delete=models.CASCADE)
+    vote=models.BooleanField(default=True)  # True for upvote, False for downvote

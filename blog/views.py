@@ -6,6 +6,7 @@ from django.core.paginator import Paginator,PageNotAnInteger,EmptyPage
 from django.db.models import Q
 from django.http import JsonResponse
 from django.core import serializers
+from django.contrib.postgres.search import SearchVector,SearchQuery,SearchRank
 # Create your views here.
 
 
@@ -71,31 +72,37 @@ def category_list(request):
 def postSearch(request):
     form=PostSearchForm()
     q=''
-    c=''
+    # c=''
     results=[]
     query=Q()
 
-    if request.POST.get('action')=='post':
-        search_string=str(request.POST.get('ss'))
+    # if request.POST.get('action')=='post':
+    #     search_string=str(request.POST.get('ss'))
 
-        if search_string is not None:
-            search_string=Post.objects.filter(title__contains=search_string)[:5]
-            data=serializers.serialize('json',list(search_string),fields=('id','title','slug'))
+    #     if search_string is not None:
+    #         search_string=Post.objects.filter(title__contains=search_string)[:5]
+    #         data=serializers.serialize('json',list(search_string),fields=('id','title','slug'))
 
-        return JsonResponse({'search_string':data})
+    #     return JsonResponse({'search_string':data})
     
     if 'q' in request.GET:
         form=PostSearchForm(request.GET)
         if form.is_valid():
             q=form.cleaned_data['q']
-            c=form.cleaned_data['c']
-            
-            if c is not None:
-                query &=Q (category=c)
-            if q is not None:
-                query &= Q(title__contains=q)
-
-            results=Post.objects.filter(query)
+            # c=form.cleaned_data['c']
+            # if c is not None:
+            #     query &=Q (category=c)
+            # if q is not None:
+                # query &= Q(title__contains=q)
+            # results=Post.objects.filter(title__search=q)
+            vector=SearchVector('title',weight='A') + \
+                     SearchVector('content',weight='B')
+            query=SearchQuery(q)
+            results=Post.objects.annotate(rank=SearchRank(
+                vector,query,cover_density=True)).order_by('-rank')
+            # results=Post.objects.annotate(
+            #     search=SearchVector('title','content'),
+            #     ).filter(search=SearchQuery(q))
 
 
     return render(request,'search.html',

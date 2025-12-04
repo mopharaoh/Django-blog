@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.postgres',
     'blog',
     'mptt',
     'accounts',
@@ -82,8 +83,12 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'blog',
+        'USER':'postgres',
+        'PASSWORD':'blabla',
+        'HOST':'localhost',
+        'PORT':'5432'
     }
 }
 
@@ -125,7 +130,7 @@ USE_I18N = True
 
 USE_TZ = True
 
-
+MPTT_REFRESH_TREE_ITEMS = False
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 

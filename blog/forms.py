@@ -22,15 +22,9 @@ class Newcomment(forms.ModelForm):
         }
 
 class PostSearchForm(forms.Form):
-    q=forms.CharField()
-    c=forms.ModelChoiceField(queryset=Category.objects.all().order_by('name'))
-    
+    q=forms.CharField()    
     def __init__(self, *args,**kargs):
         super().__init__(*args,**kargs)
-
-        self.fields['c'].label=''
-        self.fields['c'].required=False
-        self.fields['c'].label='Category'
         self.fields['q'].label='Search For'
         self.fields['q'].widget.attrs.update({'class':'form-control'})
         self.fields['q'].widget.attrs.update({'data-toggle':'dropdown'})

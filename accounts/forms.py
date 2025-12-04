@@ -28,11 +28,7 @@ class UserEditForm(forms.ModelForm):
     class Meta:
         model=User
         fields=('first_name','last_name','email')
-    def clean_email(self):
-        email=self.cleaned_data['email']
-        if User.objects.filter(email=email).exists():
-            raise ValidationError('please use another one, this email is already taken')
-        return email
+    
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)
         self.fields['first_name'].required = False

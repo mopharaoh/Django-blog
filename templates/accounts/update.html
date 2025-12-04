@@ -21,8 +21,7 @@
 
                 <form class="form-reset p-4 rounded update-form" method="post" enctype="multipart/form-data">
 
-                    {% if user_form.is_valid %}  
-                    {% comment %} and profile_form.is_valid {% endcomment %}
+                    {% if user_form.is_valid and profile_form.is_valid %}  
                     <div class="alert alert-primary" role="alert">
                         Details successfully updated!
                     </div>
@@ -40,11 +39,11 @@
                     </div>
                     {% endif %}
 
-                    {% comment %} {% if profile_form.errors %}
+                    {% if profile_form.errors %}
                     <div class="alert alert-primary" role="alert">
                         Error: Please try again!-has to be img 100px by 100bx
                     </div>
-                    {% endif %} {% endcomment %}
+                    {% endif %} 
 
                     {% csrf_token %}
                     <label class="small font-weight-bold">{{ user_form.first_name.label}}</label>
